@@ -1,2 +1,4 @@
 # Ai-maked-game
-The Game is called Apple game when comes to mind
+1.download the game first
+2.click it
+3.then you see a simple ai maded game
