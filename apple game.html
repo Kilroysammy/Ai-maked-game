@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Collector Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+  }
+  #gameCanvas {
+    border: 2px solid black;
+    margin: 20px auto;
+  }
+  #score {
+    font-size: 24px;
+  }
+  #timeLeft {
+    font-size: 20px;
+  }
+</style>
+</head>
+<body>
+<h1>Apple Collector Game</h1>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<p id="score">Score: 0</p>
+<p id="timeLeft">Time Left: 9:00</p>
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let score = 0;
+  let timeLeft = 540; // 9 minutes in seconds
+  let apples = [];
+
+  function generateApple() {
+    const x = Math.random() * (canvas.width - 2 * 20) + 20;
+    const y = Math.random() * (canvas.height - 2 * 20) + 20;
+    const radius = 20;
+    apples.push({ x, y, radius });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    apples.forEach(apple => {
+      ctx.beginPath();
+      ctx.arc(apple.x, apple.y, apple.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'red';
+      ctx.fill();
+      ctx.closePath();
+    });
+
+    document.getElementById('score').textContent = `Score: ${score}`;
+    document.getElementById('timeLeft').textContent = `Time Left: ${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}`;
+  }
+
+  function update() {
+    timeLeft--;
+
+    if (timeLeft <= 0) {
+      clearInterval(intervalId);
+      alert('Game Over! Your Score: ' + score);
+      resetGame();
+    }
+  }
+
+  function resetGame() {
+    score = 0;
+    timeLeft = 540;
+    apples = [];
+    clearInterval(intervalId);
+    startGame();
+  }
+
+  function startGame() {
+    intervalId = setInterval(function() {
+      if (apples.length < 10) {
+        generateApple();
+      }
+
+      draw();
+      update();
+    }, 1000);
+  }
+
+  canvas.addEventListener('click', function(event) {
+    const mouseX = event.clientX - canvas.offsetLeft;
+    const mouseY = event.clientY - canvas.offsetTop;
+
+    apples.forEach((apple, index) => {
+      const dx = mouseX - apple.x;
+      const dy = mouseY - apple.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < apple.radius) {
+        apples.splice(index, 1);
+        score++;
+        timeLeft += 60;
+      }
+    });
+  });
+
+  startGame();
+</script>
+</body>
+</html>
